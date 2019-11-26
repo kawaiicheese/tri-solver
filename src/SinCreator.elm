@@ -1211,6 +1211,19 @@ view model =
             text (String.fromFloat model.uScale ++ "* cos(" ++ cosinString model) |> fixedwidth |> size 8 |> filled black |> rotate (degrees 90) |> move ( -110, -82 ) |> notifyTap (TransM (\m -> { m | trigCycleU = Cos }))
     in
     [ graphPaperCustom 10 1 (rgb 255 137 5) |> makeTransparent 0.25 -- axes and selected coordinate ticks
+    , text "Solve:" |> size 12 |> filled red |> move ( -110, 0)
+    , rect 120 50 |> outlined (solid 1) black |> move ( 0, 0 )
+    , triangle 8 |> filled red |> move ( 50, 0 )
+    , triangle 8 |> filled red |> rotate (degrees -60) |> move ( -50, 0)
+
+    , text "Answer:" |> size 12 |> filled red |> move ( -110, -70)
+    , rect 120 50 |> outlined (solid 1) black |> move ( 0, -70 )
+    
+    , rect 55 23 |> filled orange |> move ( -33, -127 )
+    , text "Check Identity" |> size 8 |> filled white |> move ( -56, -130 )
+
+    , rect 55 23 |> filled orange |> move ( 33, -127 )
+    , text "Clear" |> size 8 |> filled white |> move ( 24, -130 )
     
     ]
 
