@@ -53,11 +53,11 @@ init = { time = 0
        , operColour3 = Green
        , operColour4 = Green
        , block = -1
-       , trig1 = "tan(x)"
-       , trig2 = "tan(x)"
+       , trig1 = "sin(x)"
+       , trig2 = "cos(x)"
        , trig3 = "tan(x)"
-       , trig4 = "tan(x)"
-       , trig5 = "tan(x)"
+       , trig4 = "sec(x)"
+       , trig5 = "csc(x)"
        , problemVal = Problem1
        , solutionVal = []
        }
@@ -151,8 +151,7 @@ myShapes model =
                     , text "Clear" |> size 8 |> filled white |> move ( -10, -2 )
                     ]
         in
-        [ graphPaperCustom 10 1 (rgb 255 102 102) |> makeTransparent 0.5 -- axes and selected coordinate ticks
-        , group
+        [ group
             [ group
                 [ trigComp1 |> notifyTap (ClickC 1) |> move(-100, 15)
                 , trigComp2 |> notifyTap (ClickC 2) |> move(-50, 15)
