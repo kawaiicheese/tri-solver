@@ -17,7 +17,7 @@ view model = collage 400 250 (myShapes model)
 -----------------------------------------------
 
 -- (1) define a new type with the states
-type Colours = Red | Blue | Green | Orange
+type Colours = Red | Blue | Green | Orange | White
 
 type Problems = Problem1 | Problem2 | Problem3
 
@@ -54,12 +54,13 @@ init = { time = 0
        , operColour4 = Green
        , block = -1
        , trig1 = "sin(x)"
-       , trig2 = "cos(x)"
+       , trig2 = "1"
        , trig3 = "tan(x)"
        , trig4 = "sec(x)"
        , trig5 = "csc(x)"
        , problemVal = Problem1
        , solutionVal = []
+       , solutionC = White
        }
 
 -- (4) use the new state to change how the game looks
@@ -136,7 +137,7 @@ myShapes model =
             answerBlock =
                 group
                     [ rect 320 50 |> outlined (solid 1) black
-                    , rect 320 50 |> filled white |> makeTransparent 0.5
+                    , rect 320 50 |> filled (myColour <| model.solutionC) |> makeTransparent 0.5
                     , text "Answer:" |> size 12 |> filled red |> move ( -155, 10)
                     , text (mySolution <| model.solutionVal) |> size 8 |> filled black |> move ( -150, -5)
                     ]
@@ -184,11 +185,17 @@ myColour c = case c of
                Blue   -> rgb 0 0 255
                Green  -> rgb 0 255 0
                Orange -> rgb 255 165 0
+               White -> GraphicSVG.white
 
 myProblems p = case p of
-                Problem1    -> "Temp 1"
+                Problem1    -> "cos(x)"
                 Problem2    -> "Temp 2"
                 Problem3    -> "Temp 3"
+
+solve p s = case (p,s) of
+                (Problem1, [trig3,"/",trig1]) -> Green
+                -- (Problem1, [trig2,"/",trig4]) -> Green
+                otherwise   -> Red
 
 mySolution s = List.foldl (String.append) "" s
 
@@ -273,6 +280,7 @@ update msg model = case msg of
                                         , operColour3 = Green
                                         , operColour4 = Green
                                         , solutionVal = []
+                                        , solutionC = White
                                         }
                      ClickPRight -> {model
                                         | problemVal = changePRight model.problemVal
@@ -287,6 +295,7 @@ update msg model = case msg of
                                         , operColour3 = Green
                                         , operColour4 = Green
                                         , solutionVal = []
+                                        , solutionC = White
                                         }
                      ClickClear -> { model
                                         | block = -1
@@ -300,5 +309,6 @@ update msg model = case msg of
                                         , operColour3 = Green
                                         , operColour4 = Green
                                         , solutionVal = []
+                                        , solutionC = White
                                     }
-                     ClickCheck -> model
+                     ClickCheck -> { model | solutionC = solve Problem1 model.solutionVal}
