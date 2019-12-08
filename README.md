@@ -1,2 +1,2 @@
 # tri-solver
-EZ 12
+elm make src/Main.elm
