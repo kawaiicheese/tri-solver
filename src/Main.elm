@@ -1,3 +1,13 @@
+{-
+
+Group 12
+
+Members:
+Matthew Po  400007877
+Joseph Lu   400022356
+Stanley Liu 001404020
+
+-}
 module Main exposing (..)
 
 import GraphicSVG exposing (..)
@@ -11,37 +21,32 @@ main = gameApp Tick { model = init, view = view, update = update, title = "Game 
 
 view model = collage 400 250 (myShapes model)
 
------------------------------------------------
----- this is where code from GameSlot goes ----
----- BUT MOVE "import"s above main         ----
------------------------------------------------
-
--- (1) define a new type with the states
-type Colours = Red | Blue | Green | Orange | White
-
+-- define new types
+---- Colours that are used
+---- Three sample Problems
+type Colours = Red | Blue | Green | White
 type Problems = Problem1 | Problem2 | Problem3
 
--- Answers = Dict
 
+-- Change
 changeC old = case old of
-            --    Red    -> Blue
                Blue   -> Red
-               Green  -> Orange
-            --    Orange -> Green
                otherwise -> old
 
+-- Go to the Previous Problem
 changePLeft old = case old of
                 Problem1 -> Problem3
                 Problem2 -> Problem1
                 Problem3 -> Problem2
 
+-- Go to the Next Problem
 changePRight old = case old of
                 Problem1 -> Problem2
                 Problem2 -> Problem3
                 Problem3 -> Problem1
 
 
--- (3) add new states to the start of the game
+-- Initial States
 init = { time = 0
        , funcColour1 = Blue
        , funcColour2 = Blue
@@ -52,94 +57,93 @@ init = { time = 0
        , operColour2 = Green
        , operColour3 = Green
        , operColour4 = Green
-       , block = -1
-       , trig1 = "sin(x)"
-       , trig2 = "1"
-       , trig3 = "tan(x)"
-       , trig4 = "sec(x)"
-       , trig5 = "csc(x)"
-       , problemVal = Problem1
+       , block = -1 -- Prevents two Trig or two operators in a row
+       , trig1Block = 1
+       , trig2Block = 1
+       , trig3Block = 1
+       , trig4Block = 1
+       , trig5Block = 1
+       , problem = Problem1
        , solutionVal = []
        , solutionC = White
        }
 
--- (4) use the new state to change how the game looks
---     by using model.colour and model.score
+-- Shapes
 myShapes model = 
         let
             trigComp1 = 
                 group
-                    [ rect 40 15
+                    [ rect 55 15
                         |> filled (myColour <| model.funcColour1)
-                    , text model.trig1
+                    , text (myTrig 1 <| myProblems model.problem)
                         |> filled white
-                        |> move (-16, -5)
+                        |> move (-25, -5)
                     ]
             trigComp2 = 
                 group
-                    [ rect 40 15
+                    [ rect 55 15
                         |> filled (myColour <| model.funcColour2)
-                    , text model.trig2
+                    , text (myTrig 2 <| myProblems model.problem)
                         |> filled white
-                        |> move (-16, -5)
+                        |> move (-25, -5)
                     ]
             trigComp3 = 
                 group
-                    [ rect 40 15
+                    [ rect 55 15
                         |> filled (myColour <| model.funcColour3)
-                    ,  text model.trig3
+                    ,  text (myTrig 3 <| myProblems model.problem)
                         |> filled white
-                        |> move (-16, -5)
+                        |> move (-25, -5)
                     ]
             trigComp4 = 
                 group
-                    [ rect 40 15
+                    [ rect 55 15
                         |> filled (myColour <| model.funcColour4)
-                    , text model.trig4
+                    , text (myTrig 4 <| myProblems model.problem)
                         |> filled white
-                        |> move (-16, -5)
+                        |> move (-25, -5)
                     ]
             trigComp5 = 
                 group
-                    [ rect 40 15
+                    [ rect 55 15
                         |> filled (myColour <| model.funcColour5)
-                    , text model.trig5
+                    , text (myTrig 5 <| myProblems model.problem)
                         |> filled white
-                        |> move (-16, -5)
+                        |> move (-25, -5)
                     ]
             addOpp =
                 group
                     [ roundedRect 30 15 10 |> filled (myColour <| model.operColour1)
-                    , text "+" |> filled black |> move(-3, -4)
+                    , text "+" |> filled black |> move( -3, -4 )
                     ]
             subOpp =
                 group
                     [ roundedRect 30 15 10 |> filled (myColour <| model.operColour2)
-                    , text "-" |> filled black |> move(-2, -3)
+                    , text "-" |> filled black |> move( -2, -3 )
                     ]
             mulOpp =
                 group
                     [ roundedRect 30 15 10 |> filled (myColour <| model.operColour3)
-                    , text "*" |> filled black |> move(-3, -6)
+                    , text "*" |> filled black |> move( -3, -6 )
                     ]
             divOpp =
                 group
                     [ roundedRect 30 15 10 |> filled (myColour <| model.operColour4)
-                    , text "a/b" |> filled black |> move(-9,-4)
+                    , text "/" |> filled black |> move( -2,-4 )
                     ]
             questionBlock = 
                 group
                     [ rect 320 50 |> outlined (solid 1) black
                     , rect 320 50 |> filled white |> makeTransparent 0.5
-                    , text "Solve:" |> size 12 |> filled red |> move ( -155, 10)
-                    , text (myProblems <| model.problemVal) |> size 8 |> filled black |> move ( -150, -5)
+                    , text "Solve:" |> size 12 |> filled red |> move ( -155, 10 )
+                    , text ( myTrig 0 <| myProblems model.problem ) |> size 8 |> filled black |> move ( -150, -5 )
                     ]
             answerBlock =
                 group
                     [ rect 320 50 |> outlined (solid 1) black
                     , rect 320 50 |> filled (myColour <| model.solutionC) |> makeTransparent 0.5
-                    , text "Answer:" |> size 12 |> filled red |> move ( -155, 10)
-                    , text (mySolution <| model.solutionVal) |> size 8 |> filled black |> move ( -150, -5)
+                    , text "Answer:" |> size 12 |> filled red |> move ( -155, 10 )
+                    , text (mySolution <| model.solutionVal) |> size 8 |> filled black |> move ( -150, -5 )
                     ]
             checkButton =
                 group
@@ -154,16 +158,23 @@ myShapes model =
         in
         [ group
             [ group
-                [ trigComp1 |> notifyTap (ClickC 1) |> move(-100, 15)
-                , trigComp2 |> notifyTap (ClickC 2) |> move(-50, 15)
+                [ trigComp1 |> notifyTap (ClickC 1) |> move(-120, 15)
+                , trigComp2 |> notifyTap (ClickC 2) |> move(-60, 15)
                 , trigComp3 |> notifyTap (ClickC 3) |> move(0, 15)
-                , trigComp4 |> notifyTap (ClickC 4) |> move(50, 15)
-                , trigComp5 |> notifyTap (ClickC 5) |> move(100, 15)
+                , trigComp4 |> notifyTap (ClickC 4) |> move(60, 15)
+                , trigComp5 |> notifyTap (ClickC 5) |> move(120, 15)
                 , addOpp |> notifyTap (ClickC 6) |> move(-75, -15)
                 , subOpp |> notifyTap (ClickC 7) |> move(-25, -15)
                 , mulOpp |> notifyTap (ClickC 8) |> move(25, -15)
                 , divOpp |> notifyTap (ClickC 9) |> move(75, -15)
-                , rect 240 15 |> filled black |> makeTransparent 0 |> move(0, model.block * 15)
+                -- Prevents adding trig or operator twice in a row
+                , rect 295 15 |> filled black |> makeTransparent 0 |> move(0, model.block * 15)
+                -- Allows each triginometric block to be selected once
+                , rect 55 15 |> filled black |> makeTransparent 0 |> move(-120, model.trig1Block * 30)
+                , rect 55 15 |> filled black |> makeTransparent 0 |> move(-60, model.trig2Block * 30)
+                , rect 55 15 |> filled black |> makeTransparent 0 |> move(0, model.trig3Block * 30)
+                , rect 55 15 |> filled black |> makeTransparent 0 |> move(60, model.trig4Block * 30)
+                , rect 55 15 |> filled black |> makeTransparent 0 |> move(120, model.trig5Block * 30)
                 ]
                 |> move (0,65)
             , group
@@ -178,28 +189,41 @@ myShapes model =
             |> move(0,30)
         ]
                 
-
--- tip:  use a function to simplify colour calculations
+-- simplify colours
 myColour c = case c of
                Red    -> rgb 255 0 0
                Blue   -> rgb 0 0 255
                Green  -> rgb 0 255 0
-               Orange -> rgb 255 165 0
                White -> GraphicSVG.white
 
-myProblems p = case p of
-                Problem1    -> "cos(x)"
-                Problem2    -> "Temp 2"
-                Problem3    -> "Temp 3"
+myTrig n p = Maybe.withDefault "1" <| List.head <| List.drop n p
 
+-- simplify problems
+myProblems p = case p of
+                Problem1    -> ["cos(x)","sin(x)","1","tan(x)","sec(x)","csc(x)"]
+                Problem2    -> ["sec(x)^2","1","sin^2(x)","tan^2(x)","sec(x)","cos^2(-x)"]
+                Problem3    -> ["cos(2x)","sin^2(x)","1","2","cos^2(x)","tan(x)"]
+
+-- simplify results (hard coded)
 solve p s = case (p,s) of
-                (Problem1, [trig3,"/",trig1]) -> Green
-                -- (Problem1, [trig2,"/",trig4]) -> Green
+                (Problem1,["tan(x)","/","sin(x)"]) -> Green
+                (Problem1,["sec(x)","/","1"]) -> Green
+
+                (Problem2,["1","+","tan^2(x)"]) -> Green
+                (Problem2,["tan^2(x)","+","1"]) -> Green
+                (Problem2,["cos^2(-x)","/","1"]) -> Green
+                (Problem2,["sin^2(x)","/","tan^2(x)"]) -> Green
+
+                (Problem3,["sin^2(x)","-","cos^2(x)"]) -> Green
+                (Problem3,["1","-","cos^2(x)","*","2"]) -> Green
+                (Problem3,["sin^2(x)","*","2","-","1"]) -> Green
+
                 otherwise   -> Red
 
+-- show Results
 mySolution s = List.foldl (String.append) "" s
 
--- (6) add new messages for one or more clicks
+-- functions called in update
 type Msg = Tick Float GetKeyState
          | ClickC Int
          | ClickPLeft
@@ -207,69 +231,73 @@ type Msg = Tick Float GetKeyState
          | ClickClear
          | ClickCheck
 
--- (8) change the game state when you get a click message:
 update msg model = case msg of
                      Tick t _ -> { model | time = t}
                      ClickC n  -> case n of
                                 1 ->
-                                    { model |
-                                        -- | funcColour1 = changeC model.funcColour1
-                                        solutionVal = model.trig1 :: model.solutionVal
+                                    { model
+                                        | funcColour1 = changeC model.funcColour1
+                                        , solutionVal = (myTrig 1 <| myProblems model.problem) :: model.solutionVal
+                                        , trig1Block = 0.5
                                         , block = -1 * model.block
                                     }
                                 2 ->
-                                    { model |
-                                        -- | funcColour2 = changeC model.funcColour2 
-                                        solutionVal = model.trig2 :: model.solutionVal
+                                    { model
+                                        | funcColour2 = changeC model.funcColour2 
+                                        , solutionVal = (myTrig 2 <| myProblems model.problem) :: model.solutionVal
+                                        , trig2Block = 0.5
                                         , block = -1 * model.block
                                     }
                                 3 ->
-                                    { model |
-                                        -- | funcColour3 = changeC model.funcColour3 
-                                        solutionVal = model.trig3 :: model.solutionVal
+                                    { model
+                                        | funcColour3 = changeC model.funcColour3 
+                                        , solutionVal = (myTrig 3 <| myProblems model.problem):: model.solutionVal
+                                        , trig3Block = 0.5
                                         , block = -1 * model.block
                                     }
                                 4 ->
-                                    { model |
-                                        -- | funcColour4 = changeC model.funcColour4 
-                                        solutionVal = model.trig4 :: model.solutionVal
+                                    { model
+                                        | funcColour4 = changeC model.funcColour4 
+                                        , solutionVal = (myTrig 4 <| myProblems model.problem) :: model.solutionVal
+                                        , trig4Block = 0.5
                                         , block = -1 * model.block
                                     }
                                 5 ->
-                                    { model |
-                                        -- | funcColour5 = changeC model.funcColour5 
-                                        solutionVal = model.trig5 :: model.solutionVal
+                                    { model
+                                        | funcColour5 = changeC model.funcColour5 
+                                        , solutionVal = (myTrig 5 <| myProblems model.problem) :: model.solutionVal
+                                        , trig5Block = 0.5
                                         , block = -1 * model.block
                                     }
                                 6 ->
                                     { model |
-                                        -- | operColour1 = changeC model.operColour1 
                                         solutionVal = "+" :: model.solutionVal
                                         , block = -1 * model.block
                                     }
                                 7 ->
                                     { model |
-                                        -- | operColour2 = changeC model.operColour2 
                                         solutionVal = "-" :: model.solutionVal
                                         , block = -1 * model.block
                                     }
                                 8 ->
                                     { model |
-                                        -- | operColour3 = changeC model.operColour3 
                                         solutionVal = "*" :: model.solutionVal
                                         , block = -1 * model.block
                                     }
                                 9 ->
-                                    { model |
-                                        -- | operColour4 = changeC model.operColour4 
-                                        solutionVal = "/" :: model.solutionVal
+                                    { model | solutionVal = "/" :: model.solutionVal
                                         , block = -1 * model.block
                                     }
                                 otherwise  ->
                                     model
                      ClickPLeft -> { model 
-                                        | problemVal = changePLeft model.problemVal
+                                        | problem = changePLeft model.problem
                                         , block = -1
+                                        , trig1Block = 1
+                                        , trig2Block = 1
+                                        , trig3Block = 1
+                                        , trig4Block = 1
+                                        , trig5Block = 1
                                         , funcColour1 = Blue
                                         , funcColour2 = Blue
                                         , funcColour3 = Blue
@@ -283,8 +311,13 @@ update msg model = case msg of
                                         , solutionC = White
                                         }
                      ClickPRight -> {model
-                                        | problemVal = changePRight model.problemVal
+                                        | problem = changePRight model.problem
                                         , block = -1
+                                        , trig1Block = 1
+                                        , trig2Block = 1
+                                        , trig3Block = 1
+                                        , trig4Block = 1
+                                        , trig5Block = 1
                                         , funcColour1 = Blue
                                         , funcColour2 = Blue
                                         , funcColour3 = Blue
@@ -299,6 +332,11 @@ update msg model = case msg of
                                         }
                      ClickClear -> { model
                                         | block = -1
+                                        , trig1Block = 1
+                                        , trig2Block = 1
+                                        , trig3Block = 1
+                                        , trig4Block = 1
+                                        , trig5Block = 1
                                         , funcColour1 = Blue
                                         , funcColour2 = Blue
                                         , funcColour3 = Blue
@@ -311,4 +349,4 @@ update msg model = case msg of
                                         , solutionVal = []
                                         , solutionC = White
                                     }
-                     ClickCheck -> { model | solutionC = solve Problem1 model.solutionVal}
+                     ClickCheck -> { model | solutionC = solve model.problem model.solutionVal}
